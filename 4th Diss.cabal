@@ -16,6 +16,7 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 executable 4th Diss
-  -- main-is:             
-  -- other-modules:       
-  build-depends:       base ==4.5.*, netwire ==4.0.*, time ==1.4.*, SFML ==0.1.*, mtl ==2.1.*, lens ==3.7.*, OpenGL ==2.2.*, hmatrix ==0.13.*
+  main-is:           Main.hs
+  other-modules:     Engine.Display, Engine.RigidBody, Engine.World,
+                     Netwire.SFML.Wires, Netwire.SFML  
+  build-depends:     base ==4.5.*, netwire ==4.0.*, time ==1.4.*, SFML ==0.1.*, mtl ==2.1.*, lens ==3.7.*, OpenGL ==2.2.*, hmatrix ==0.13.*
