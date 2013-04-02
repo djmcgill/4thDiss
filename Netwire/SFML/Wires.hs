@@ -12,34 +12,26 @@ import SFML.Window
 import Netwire.SFML
 
 --TODO: have a good think about possibly needed wires
+--      rexport from Netwire.SFML?
 
 
 -- | Remembers the size of the window.
--- | If it hasn't yet been resized, calls 'getWindowSize'.
-windowSize :: Wire () IO Input (Int, Int)
-windowSize = hold_ resized <|> getCurrentSize
-    where
-    getCurrentSize = proc (window, _) -> do
-        (Vec2u w h) <- perform -< getWindowSize window
-        returnA -< (fromIntegral w, fromIntegral h)
+--   XXX: not called yet?
+windowSize :: (Monoid e, Monad m) => Wire e m Input (Maybe (Int, Int))
+windowSize = hold Nothing (Just <$> resized)
 
 -- | Remembers the position of the mouse relative to the window.
---   If it hasn't yet been resized, calls 'getMousePosition'.
--- TODO: why not always just call it?
-mousePosition :: Wire () IO Input (Int, Int)
-mousePosition = hold_ mouseMoved <|> getCurrentMousePosition
-    where
-    getCurrentMousePosition = proc (window, _) -> do
-        (Vec2i w h) <- perform -< getMousePosition (Just window)
-        returnA -< (w, h)
+--   XXX: not called yet?
+mousePosition :: (Monoid e, Monad m) => Wire e m Input (Maybe (Int, Int))
+mousePosition = hold Nothing (Just <$> mouseMoved)
 
-keyPressed :: KeyCode -> Wire () IO Input ()
-keyPressed kc = keyPressed kc = whenEvent p
+keyPressed :: (Monoid e, Monad m) => KeyCode -> Wire e m Input ()
+keyPressed kc = whenEvent p
     where
     p (SFEvtKeyPressed kc' _ _ _ _) | kc == kc' = Just ()
     p _ = Nothing
 
-mousePressed :: MouseButton -> Wire () IO Input ()
+mousePressed :: (Monoid e, Monad m) => MouseButton -> Wire e m Input ()
 mousePressed b = whenEvent p
     where
     p (SFEvtMouseButtonPressed b' x y) | b == b' = Just ()
@@ -47,112 +39,113 @@ mousePressed b = whenEvent p
 
 -- also some kind of modifiers wire, check yampa-glut
 
-simpleMousePosition :: Fractional a => Wire () IO Input (a, a)
-simpleMousePosition = undefined -- scale mousePosition to between [-1,1]^2 using windowSize
+simpleMousePosition :: (Fractional a, Monoid e, Monad m) => Wire e m Input (a, a)
+simpleMousePosition = undefined -- TODO: scale mousePosition to between [-1,1]^2 using windowSize
 
-closed :: Wire () IO Input ()
+closed :: (Monoid e, Monad m) => Wire e m Input ()
 closed = whenEvent p
     where
     p SFEvtClosed = Just ()
     p _ = Nothing
 
-resized :: Wire () IO Input (Int,Int)
+resized :: (Monoid e, Monad m) => Wire e m Input (Int,Int)
 resized = whenEvent p
     where
     p (SFEvtResized x y) = Just (x,y)
     p _ = Nothing
 
-lostFocus :: Wire () IO Input ()
+lostFocus :: (Monoid e, Monad m) => Wire e m Input ()
 lostFocus = whenEvent p
     where
     p SFEvtLostFocus = Just ()
     p _ = Nothing
 
-gainedFocus :: Wire () IO Input ()
+gainedFocus :: (Monoid e, Monad m) => Wire e m Input ()
 gainedFocus = whenEvent p
     where
     p SFEvtGainedFocus = Just ()
     p _ = Nothing
 
-textEntered :: Wire () IO Input String
+textEntered :: (Monoid e, Monad m) => Wire e m Input String
 textEntered = whenEvent p
     where
     p (SFEvtTextEntered s) = Just s
     p _ = Nothing
 
-keyEvent :: Wire () IO Input (KeyCode, Bool, Bool, Bool, Bool)
+-- TODO: clearly document what all these bools mean
+keyEvent :: (Monoid e, Monad m) => Wire e m Input (KeyCode, Bool, Bool, Bool, Bool)
 keyEvent = whenEvent p
     where
     p (SFEvtKeyPressed c m1 m2 m3 m4) = Just (c, m1, m2, m3, m4)
     p _ = Nothing
 
-keyReleased :: Wire () IO Input (KeyCode, Bool, Bool, Bool, Bool)
+keyReleased :: (Monoid e, Monad m) => Wire e m Input (KeyCode, Bool, Bool, Bool, Bool)
 keyReleased = whenEvent p
     where
     p (SFEvtKeyReleased c m1 m2 m3 m4) = Just (c, m1, m2, m3, m4)
     p _ = Nothing
 
-mouseWheelMoved :: Wire () IO Input (Int, Int, Int)
+mouseWheelMoved :: (Monoid e, Monad m) => Wire e m Input (Int, Int, Int)
 mouseWheelMoved = whenEvent p
     where
     p (SFEvtMouseWheelMoved d x y) = Just (d, x, y)
     p _ = Nothing
 
-mouseButtonPressed :: Wire () IO Input (MouseButton, Int, Int)
+mouseButtonPressed :: (Monoid e, Monad m) => Wire e m Input (MouseButton, Int, Int)
 mouseButtonPressed = whenEvent p
     where
     p (SFEvtMouseButtonPressed b x y) = Just (b, x, y)
     p _ = Nothing
 
-mouseButtonReleased :: Wire () IO Input (MouseButton, Int, Int)
+mouseButtonReleased :: (Monoid e, Monad m) => Wire e m Input (MouseButton, Int, Int)
 mouseButtonReleased = whenEvent p
     where
     p (SFEvtMouseButtonReleased b x y) = Just (b, x, y)
     p _ = Nothing
 
-mouseMoved :: Wire () IO Input (Int, Int)
+mouseMoved :: (Monoid e, Monad m) => Wire e m Input (Int, Int)
 mouseMoved = whenEvent p
     where
     p (SFEvtMouseMoved x y) = Just (x, y)
     p _ = Nothing
 
-mouseEntered :: Wire () IO Input ()
+mouseEntered :: (Monoid e, Monad m) => Wire e m Input ()
 mouseEntered = whenEvent p
     where
     p SFEvtMouseEntered = Just ()
     p _ = Nothing
 
-mouseLeft :: Wire () IO Input ()
+mouseLeft :: (Monoid e, Monad m) => Wire e m Input ()
 mouseLeft = whenEvent p
     where
     p SFEvtMouseLeft = Just ()
     p _ = Nothing
 
-joystickButtonPressed :: Wire () IO Input (Int, Int)
+joystickButtonPressed :: (Monoid e, Monad m) => Wire e m Input (Int, Int)
 joystickButtonPressed = whenEvent p
     where
     p (SFEvtJoystickButtonPressed id bt) = Just (id, bt)
     p _ = Nothing
 
-joystickButtonReleased :: Wire () IO Input (Int, Int)
+joystickButtonReleased :: (Monoid e, Monad m) => Wire e m Input (Int, Int)
 joystickButtonReleased = whenEvent p
     where
     p (SFEvtJoystickButtonReleased id bt) = Just (id, bt)
     p _ = Nothing
 
-joystickMoved :: Wire () IO Input (Int, JoystickAxis, Float)
+joystickMoved :: (Monoid e, Monad m) => Wire e m Input (Int, JoystickAxis, Float)
 joystickMoved = whenEvent p
     where
     p (SFEvtJoystickMoved id a p) = Just (id, a, p)
     p _ = Nothing
 
-joystickConnected :: Wire () IO Input Int
+joystickConnected :: (Monoid e, Monad m) => Wire e m Input Int
 joystickConnected = whenEvent p
     where
     p (SFEvtJoystickConnected id) = Just id
     p _ = Nothing
 
-joystickDisconnected :: Wire () IO Input Int
+joystickDisconnected :: (Monoid e, Monad m) => Wire e m Input Int
 joystickDisconnected = whenEvent p
     where
     p (SFEvtJoystickDisconnected id) = Just id
@@ -160,6 +153,6 @@ joystickDisconnected = whenEvent p
 
 
 -- Helpers
-whenEvent :: Monoid e => (a -> Maybe b) -> Wire e m (w, Maybe a) b
-whenEvent f = mkFix $ \_ (_,x) -> maybe (Left mempty) Right (x >>= f)
+whenEvent :: (Monoid e, Monad m) => (a -> Maybe b) -> Wire e m (Maybe a) b
+whenEvent f = mkFix $ \_ x -> maybe (Left mempty) Right (x >>= f)
 

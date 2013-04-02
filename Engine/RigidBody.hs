@@ -57,6 +57,7 @@ makeLenses ''RigidBody
 makeLenses ''RigidBodyDiff
 
 -- TODO: instead of just an acc, allow also to set velocity(s) or position(s)
+--       use accumT here instead of an explicit function?
 rigidObject :: Monad m => RigidBody -> Wire e m (Acceleration, PostUpdateFun) RigidBody
 rigidObject initialBody = mkState initialBody rigidObject' . withTime
     where

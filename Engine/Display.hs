@@ -8,7 +8,7 @@ import Control.Monad (forM_)
 import Graphics.Rendering.OpenGL hiding (Sphere)
 import qualified Graphics.Rendering.OpenGL as GL
 import Numeric.LinearAlgebra hiding (scale)
-import SFML.Graphics hiding (scale, Quads)
+import SFML.Graphics hiding (rotate, scale, Quads)
 
 
 drawWorld :: RenderWindow -> World -> IO ()
@@ -30,14 +30,11 @@ drawWorld window world = do
     display window
 
 lookAtView :: WorldView -> IO ()
-lookAtView view =
-    lookAt (Vertex3 eyeX eyeY eyeZ)
-           (Vertex3 centreX centreY centreZ)
-           (Vector3 upX upY upZ)
-    where
-    [eyeX, eyeY, eyeZ] = toList (view^.eyeLocation)
-    [centreX, centreY, centreZ] = toList (view^.eyeLocation + view^.eyeForward)
-    [upX, upY, upZ] = toList (view^.eyeUp)
+lookAtView view = do -- TODO: are these brackets needed?
+    let [eyeX, eyeY, eyeZ] = toList (negate (view^.eyeLocation))
+    translate (Vector3 eyeX eyeY eyeZ)
+    rotate (negate (view^.eyeVerticalTilt))   (Vector3 1 0 0)
+    rotate (negate (view^.eyeHorizontalTilt)) (Vector3 0 1 0)
 
 drawBasicObject :: BasicObject -> IO ()
 drawBasicObject (Sphere radius) = renderQuadric style prim
