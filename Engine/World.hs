@@ -52,7 +52,7 @@ initialCube :: Object
 initialCube = Object basicCuboid forceFunction (createUniformBody basicCuboid & x .~ startingPos)
     where
     forceFunction :: Input -> (Acceleration, PostUpdateFun)
-    forceFunction _ = (\_ _ -> (fromList [0,0,-10], fromList [0,0,0]), bounce)
+    forceFunction _ = (\_ -> (fromList [0,0,-10], fromList [0,0,0]), bounce)
 
     -- if z <= 1, reverse its vertical speed
     bounce :: RigidBody -> RigidBody
@@ -110,13 +110,7 @@ createUniformBody (Sphere r0) = updateStateVars $ RigidBody {
     _omega    = zeroVector}
     where
     mass' = (4/3)*pi*r0^3
-    iBody' = undefined
-    {-
-    XXX: these are almost certainly wrong, there are some off-diag terms probably
-    I_xx = 10/15 * pi * r_0^5
-    I_yy = 8 /15 * pi * r_0^5
-    I_zz = 2 /5  * pi * r_0^5
-    -}
+    iBody' = diag . scale (r0^5 * pi) $ fromList [2/3, 8/15, 2/5]
 
 zeroMatrix :: Matrix Double
 zeroMatrix = konst 0 (3,3)

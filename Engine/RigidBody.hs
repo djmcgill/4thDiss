@@ -18,10 +18,10 @@ import Numeric.GSL.ODE
 import Numeric.LinearAlgebra
 import Prelude hiding ((.), id)
 
-type Acceleration = RigidBody -> Time -> (Force, Torque)
+type Acceleration = RigidBody -> (Force, Torque)
 
 zeroAcc :: Acceleration
-zeroAcc _ _ = (zeroV, zeroV)
+zeroAcc _ = (zeroV, zeroV)
     where zeroV = fromList [0,0,0]
 
 type Force = Vector Double
@@ -58,17 +58,13 @@ makeLenses ''RigidBodyDiff
 
 -- TODO: instead of just an acc, allow also to set velocity(s) or position(s)
 --       use accumT here instead of an explicit function?
+--       XXX: need absolute time too?
 rigidObject :: Monad m => RigidBody -> Wire e m (Acceleration, PostUpdateFun) RigidBody
-rigidObject initialBody = mkState initialBody rigidObject' . withTime
+rigidObject = accumT1 rigidObject'
     where
-    rigidObject' :: Time -> ((Acceleration, PostUpdateFun, Time), RigidBody) -> (Either e RigidBody, RigidBody)
-    rigidObject' t ((acc, postUpdate, dt), body) =
-        let body' = postUpdate (updateStateVars (ode body t (t+dt) acc))
-        in  (Right body', body')
-
-    withTime :: Monad m => Wire e m (a, b) (a, b, Time)
-    withTime = arr (\((a,f),t) -> (a,f,t)) . (id &&& dtime)
-
+    rigidObject' :: Time -> RigidBody -> (Acceleration, PostUpdateFun) -> RigidBody
+    rigidObject' dt _ _ | dt <= 0 = error "dt <= 0 in rigidObject'"
+    rigidObject' dt body (acc, postUpdate) = postUpdate (updateStateVars (ode body 0 dt acc))
 
 updateStateVars :: RigidBody -> RigidBody
 updateStateVars body =
@@ -80,7 +76,7 @@ updateStateVars body =
 dydt :: Acceleration -> RigidBody -> Time -> RigidBodyDiff
 dydt acc body t = RigidBodyDiff (body^.v) rDot' force torque
     where
-    (force, torque) = acc body t
+    (force, torque) = acc body -- XXX: how should acceleration interact with time?!?!
     rDot'           = star (body^.omega) <> body^.r
 
 ode :: RigidBody
