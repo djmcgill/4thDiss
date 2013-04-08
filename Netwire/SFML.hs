@@ -1,8 +1,9 @@
 module Netwire.SFML where
+-- TODO: rename to Control.Wire.SFML?
 
 import Control.Monad (unless, when)
 import Control.Wire hiding (when, unless, window)
-import Data.Maybe (isJust, fromJust)
+import Data.Maybe (isJust)
 import Data.Time.Clock (getCurrentTime, diffUTCTime)
 import Data.IORef (newIORef, readIORef, writeIORef)
 import Prelude hiding (id, (.))

@@ -4,7 +4,6 @@ module Netwire.SFML.Wires where
 
 import Control.Monad hiding (when)
 import Control.Wire
-import Data.Maybe (fromJust, isJust)
 import Data.Monoid (Monoid, mempty)
 import Prelude hiding (id, (.))
 import SFML.Window
@@ -34,7 +33,7 @@ keyPressed kc = whenEvent p
 mousePressed :: (Monoid e, Monad m) => MouseButton -> Wire e m Input ()
 mousePressed b = whenEvent p
     where
-    p (SFEvtMouseButtonPressed b' x y) | b == b' = Just ()
+    p (SFEvtMouseButtonPressed b' _ _) | b == b' = Just ()
     p _ = Nothing
 
 -- also some kind of modifiers wire, check yampa-glut

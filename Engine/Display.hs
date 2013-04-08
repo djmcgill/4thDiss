@@ -1,6 +1,8 @@
 module Engine.Display where
 
 import Engine.RigidBody
+import Engine.Objects
+import Engine.View
 import Engine.World
 
 import Control.Lens

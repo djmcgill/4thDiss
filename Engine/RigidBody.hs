@@ -9,10 +9,7 @@
 
 module Engine.RigidBody where
 
-import Debug.Trace
-
 import Control.Lens
-import Control.Monad.Identity (Identity)
 import Control.Wire hiding (loop, force)
 import Numeric.GSL.ODE
 import Numeric.LinearAlgebra
