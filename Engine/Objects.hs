@@ -10,12 +10,6 @@ import Control.Wire
 import Numeric.LinearAlgebra
 import Prelude hiding ((.), id)
 
-data Object = Object
-    { basicObject :: BasicObject
-    , forces      :: (Input -> (Acceleration, PostUpdateFun))
-    , body        :: RigidBody}
-    -- TODO: make these lens
-
 data BasicObject
     = Sphere {_radius :: Double}
     | Cuboid {_xlen :: Double
@@ -23,11 +17,19 @@ data BasicObject
              ,_zlen :: Double}
 makeLenses ''BasicObject
 
-isSphere (Object (Sphere _) _ _) = True
-isSphere _ = False
+data Object = Object
+    { _basicObject :: BasicObject
+    , _forces      :: (Input -> (Acceleration, PostUpdateFun))
+    , _body        :: RigidBody}
+makeLenses ''Object
 
+isSphere :: Object -> Bool
+isSphere (Object (Sphere _) _ _) = True
+isSphere _                       = False
+
+isCuboid :: Object -> Bool
 isCuboid (Object (Cuboid _ _ _) _ _) = True
-isCuboid _ = False
+isCuboid _                           = False
 
 initialCube :: Object
 initialCube = Object basicCuboid forceFunction (createUniformBody basicCuboid & x .~ startingPos)

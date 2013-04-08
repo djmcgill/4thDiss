@@ -1,12 +1,5 @@
 {-# LANGUAGE Arrows, TemplateHaskell #-}
 
--- TODO:
---     simple physics objects
---         bouncing ball example
---     renderer
---     collisions
---     maybe just get rid of lens?
-
 module Engine.RigidBody where
 
 import Control.Lens
@@ -124,5 +117,3 @@ updateRigidBody body vec =
     . (l .~ l')
     $ body
     where [x',r',p',l'] = takesV [3,9,3,3] vec
-
-

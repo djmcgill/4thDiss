@@ -12,7 +12,6 @@ import qualified Graphics.Rendering.OpenGL as GL
 import Numeric.LinearAlgebra hiding (scale)
 import SFML.Graphics hiding (rotate, scale, Quads)
 
-
 drawWorld :: RenderWindow -> World -> IO ()
 drawWorld window world = do
     setWindowActive window True
@@ -21,28 +20,25 @@ drawWorld window world = do
     matrixMode $= Projection
     loadIdentity
     perspective 90 1 1 50 -- probably don't need to call this every frame
-
-    lookAtView (world^.worldView)
+    lookAtView $ world^.worldView
 
     forM_ (world^.objects) $ \(Object basicObj _ body) -> preservingMatrix $ do
-        let [x1,x2,x3] = toList (body^.x)
-        translate (Vector3 x1 x2 x3)
+        let [x1,x2,x3] = toList $ body^.x
+        translate $ Vector3 x1 x2 x3
         drawBasicObject basicObj
-        print (x1,x2,x3)
     display window
 
 lookAtView :: WorldView -> IO ()
-lookAtView view = do -- TODO: are these brackets needed?
-    let [eyeX, eyeY, eyeZ] = toList (negate (view^.eyeLocation))
-    translate (Vector3 eyeX eyeY eyeZ)
-    rotate (negate (view^.eyeVerticalTilt))   (Vector3 1 0 0)
-    rotate (negate (view^.eyeHorizontalTilt)) (Vector3 0 1 0)
+lookAtView view = do
+    let [eyeX, eyeY, eyeZ] = toList . negate $ view^.eyeLocation
+    translate $ Vector3 eyeX eyeY eyeZ
+    rotate (negate (view^.eyeVerticalTilt))   $ Vector3 1 0 0
+    rotate (negate (view^.eyeHorizontalTilt)) $ Vector3 0 1 0
 
 drawBasicObject :: BasicObject -> IO ()
-drawBasicObject (Sphere radius) = renderQuadric style prim
+drawBasicObject (Sphere radius) = renderQuadric style $ GL.Sphere radius 10 10
     where
-    style = QuadricStyle Nothing NoTextureCoordinates Outside LineStyle -- TODO: solid sphere
-    prim = GL.Sphere radius 10 10
+    style = QuadricStyle Nothing NoTextureCoordinates Outside FillStyle
 drawBasicObject (Cuboid xlen ylen zlen) = preservingMatrix $ do
     scale (xlen/2) (ylen/2) (zlen/2)
     renderPrimitive Quads . mapM_ vertex $
