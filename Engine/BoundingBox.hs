@@ -1,4 +1,3 @@
--- sort and sweep
 {-# LANGUAGE TupleSections, GeneralizedNewtypeDeriving #-}
 
 module BoundingBox where
@@ -27,7 +26,8 @@ data IntervalPoint = Start ID | End ID
 --           then they have changed whether or not they are overlapped
 --       IntMap, or even Vector
 --       portentially switch to paolino's code (see chatlog)?
--- talk: talk about optimising with addInterval and removeInterval
+-- talk: sort and sweep algorithm
+--       talk about optimising with addInterval and removeInterval
 
 -- | Given a list of objects, return the pairs of collisions and
 --   and remaining non-collided ones.

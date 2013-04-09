@@ -15,11 +15,11 @@ import Netwire.SFML
 
 -- | Remembers the size of the window.
 --   XXX: not called yet?
+--   XXX: assumed there is only one window
 windowSize :: (Monoid e, Monad m) => Wire e m Input (Maybe (Int, Int))
 windowSize = hold Nothing (Just <$> resized)
 
 -- | Remembers the position of the mouse relative to the window.
---   XXX: not called yet?
 mousePosition :: (Monoid e, Monad m) => Wire e m Input (Maybe (Int, Int))
 mousePosition = hold Nothing (Just <$> mouseMoved)
 
@@ -34,11 +34,6 @@ mousePressed b = whenEvent p
     where
     p (SFEvtMouseButtonPressed b' _ _) | b == b' = Just ()
     p _ = Nothing
-
--- also some kind of modifiers wire, check yampa-glut
-
-simpleMousePosition :: (Fractional a, Monoid e, Monad m) => Wire e m Input (a, a)
-simpleMousePosition = undefined -- TODO: scale mousePosition to between [-1,1]^2 using windowSize
 
 closed :: (Monoid e, Monad m) => Wire e m Input ()
 closed = whenEvent p

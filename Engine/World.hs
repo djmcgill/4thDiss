@@ -10,12 +10,11 @@ import Control.Lens
 import Control.Wire
 import Data.Monoid (Monoid)
 import Prelude hiding (id, (.))
-import SFML.Window (SFEvent(SFEvtClosed, SFEvtKeyPressed), KeyCode(..))
+import SFML.Window (SFEvent(..), KeyCode(..))
 
 data World = World {
     _objects   :: [Object],
-    _worldView :: WorldView
-}
+    _worldView :: WorldView}
 makeLenses ''World
 
 initialWorld :: World
@@ -32,6 +31,7 @@ worldWire = proc mEvent -> do
 
 worldToWire :: (Monoid e, Monad m) => World -> Wire e m Input World
 worldToWire initialWorld = proc input -> do
-    worldView' <- viewToWire (initialWorld^.worldView) -< input
-    objects' <- multicast (map objectToWire (initialWorld^.objects)) -< input
-    returnA -< (World objects' worldView')
+    worldView' <- viewToWire (initialWorld^.worldView)                 -< input
+    objects'   <- multicast (map objectToWire (initialWorld^.objects)) -< input
+    -- let objects'' = onBoxCollisions somethingOrOther objects'
+    returnA -< World objects' worldView'

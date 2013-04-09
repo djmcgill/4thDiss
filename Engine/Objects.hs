@@ -45,11 +45,6 @@ initialCube = Object basicCuboid forceFunction (createUniformBody basicCuboid & 
     basicCuboid = Cuboid 1 1 1
     startingPos = fromList [0,0,10]
 
-zeroMatrix :: Matrix Double
-zeroMatrix = konst 0 (3,3)
-zeroVector :: Vector Double
-zeroVector = fromList [0,0,0]
-
 -- | Given an initial object, turn it into a Wire that holds its state
 objectToWire :: Monad m => Object -> Wire e m Input Object
 objectToWire (Object basic forces rigid) = Object basic forces <$> rigidObject rigid . arr forces

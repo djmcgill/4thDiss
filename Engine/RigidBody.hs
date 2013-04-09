@@ -11,8 +11,12 @@ import Prelude hiding ((.), id)
 type Acceleration = RigidBody -> (Force, Torque)
 
 zeroAcc :: Acceleration
-zeroAcc _ = (zeroV, zeroV)
-    where zeroV = fromList [0,0,0]
+zeroAcc _ = (zeroVector, zeroVector)
+
+zeroMatrix :: Matrix Double
+zeroMatrix = konst 0 (3,3)
+zeroVector :: Vector Double
+zeroVector = constant 0 3
 
 type Force = Vector Double
 type Torque = Vector Double
@@ -33,27 +37,24 @@ data RigidBody = RigidBody {
     -- Derived quantities (auxiliary variables)
     _iInv      :: Matrix Double, -- I^(-1)(t)
     _v         :: Vector Double, -- v(t)
-    _omega     :: Vector Double  -- \omega(t)
-}
+    _omega     :: Vector Double}  -- \omega(t)
 
 data RigidBodyDiff = RigidBodyDiff {
     _dxdt :: Vector Double, -- d/dt (x(t)) = v(t)
     _rDot :: Matrix Double, -- Rdot(t)     = star(omega(t))R(t)
     _dpdt :: Vector Double, -- d/dt (P(t)) = F(t)
-    _dldt :: Vector Double  -- d/dt (L(t)) = tau(t)
-}
+    _dldt :: Vector Double}  -- d/dt (L(t)) = tau(t)
 
 makeLenses ''RigidBody
 makeLenses ''RigidBodyDiff
 
 -- TODO: instead of just an acc, allow also to set velocity(s) or position(s)
---       use accumT here instead of an explicit function?
 --       XXX: need absolute time too?
 rigidObject :: Monad m => RigidBody -> Wire e m (Acceleration, PostUpdateFun) RigidBody
 rigidObject = accumT1 rigidObject'
     where
     rigidObject' :: Time -> RigidBody -> (Acceleration, PostUpdateFun) -> RigidBody
-    rigidObject' dt _ _ | dt <= 0 = error "dt <= 0 in rigidObject'"
+    rigidObject' dt _ _ | dt <= 0 = error $ "dt = " ++ show dt ++ " in rigidObject'"
     rigidObject' dt body (acc, postUpdate) = postUpdate (updateStateVars (ode body 0 dt acc))
 
 updateStateVars :: RigidBody -> RigidBody
