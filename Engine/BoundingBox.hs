@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections, GeneralizedNewtypeDeriving #-}
 
-module BoundingBox where
+module Engine.BoundingBox where
 
 import           Control.Applicative ((<$>))
 import           Control.Monad (join)
@@ -12,7 +12,7 @@ import qualified Data.Set as S
 import           Numeric.LinearAlgebra hiding ((<>))
 
 import Engine.RigidBody
-import Engine.World
+import Engine.Objects
 
 type ID = Int
 type Interval      = (ID, Double, Double)
@@ -50,12 +50,12 @@ onBoxCollisions processCollision objects = M.elems $ foldl' actOnCollision objec
 
     getObjectIntervals :: ID -> Object -> (Interval, Interval, Interval)
     getObjectIntervals id object
-        | isSphere object = let Sphere r0       = basicObject object in makeCuboidIntervals r0 r0 r0
-        | isCuboid object = let Cuboid x0 y0 z0 = basicObject object in makeCuboidIntervals x0 y0 z0
+        | isSphere object = let Sphere r0       = object^.basicObject in makeCuboidIntervals r0 r0 r0
+        | isCuboid object = let Cuboid x0 y0 z0 = object^.basicObject in makeCuboidIntervals x0 y0 z0
         where
         makeCuboidIntervals :: Double -> Double -> Double -> (Interval, Interval, Interval)
         makeCuboidIntervals x0 y0 z0 =
-            let centre    = (body object)^.x
+            let centre    = object^.body.x
                 xInterval = (id, centre@>0 - (x0/2), centre@>0 - (x0/2))
                 yInterval = (id, centre@>1 - (y0/2), centre@>1 - (y0/2))
                 zInterval = (id, centre@>2 - (z0/2), centre@>2 - (z0/2))

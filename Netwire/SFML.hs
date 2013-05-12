@@ -38,7 +38,7 @@ runGameWire
     -> IO ()
 runGameWire fps draw finalise wire window = do
     -- TODO: maybe "window.PreserveOpenGLStates( true );"?
-    lastEvent <- getCurrentTime -- TODO: Maybe use SFML's timer instead?
+    lastEvent <- getCurrentTime
     sfSleep (seconds 0.01)
     loop wire lastEvent
     destroy window
@@ -49,16 +49,13 @@ runGameWire fps draw finalise wire window = do
     loop w lastEvent = do
         now <- getCurrentTime
         let dt = realToFrac $ diffUTCTime now lastEvent
-        print $ "dt in runGameWire = " ++ show dt
         let processEvent mEvent | isJust mEvent || fps == 0 || dt > spf = do
                 (eOut, w') <- stepWire w dt mEvent
-                either (error "wire inhibited") -- XXX: how to deal with exceptions?
-                       -- TODO: continue computing the next step in parallel?
-                       -- TODO: get the time now and only sleep for that amount of time?
+                either (error "wire inhibited")
                        (\out -> unless (toExit out) $ do
                                     when (toDraw out) . void . forkIO . draw' $ world out
                                     sfSleep (seconds (realToFrac spf))
                                     loop w' now)
                        eOut
-            processEvent _ = sfSleep (seconds 0.01) >> loop w lastEvent -- TODO: check that it's not minimised
+            processEvent _ = sfSleep (seconds 0.01) >> loop w lastEvent
         pollEvent window >>= processEvent

@@ -2,6 +2,7 @@
 
 module Engine.World where
 
+import Engine.BoundingBox
 import Engine.Objects
 import Engine.View
 import Netwire.SFML
@@ -9,8 +10,12 @@ import Netwire.SFML
 import Control.Lens
 import Control.Wire
 import Data.Monoid (Monoid)
+import Numeric.LinearAlgebra
 import Prelude hiding (id, (.))
 import SFML.Window (SFEvent(..), KeyCode(..))
+
+import Data.Time.Clock (getCurrentTime)
+import System.IO.Unsafe (unsafePerformIO)
 
 data World = World {
     _objects   :: [Object],
@@ -18,7 +23,7 @@ data World = World {
 makeLenses ''World
 
 initialWorld :: World
-initialWorld = World [initialCube] initialView
+initialWorld = World [initialCube, initialCube2] initialView
 
 worldWire :: Wire () IO Input (Output World)
 worldWire = proc mEvent -> do
@@ -33,5 +38,4 @@ worldToWire :: (Monoid e, Monad m) => World -> Wire e m Input World
 worldToWire initialWorld = proc input -> do
     worldView' <- viewToWire (initialWorld^.worldView)                 -< input
     objects'   <- multicast (map objectToWire (initialWorld^.objects)) -< input
-    -- let objects'' = onBoxCollisions somethingOrOther objects'
     returnA -< World objects' worldView'

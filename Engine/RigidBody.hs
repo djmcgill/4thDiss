@@ -48,18 +48,16 @@ data RigidBodyDiff = RigidBodyDiff {
 makeLenses ''RigidBody
 makeLenses ''RigidBodyDiff
 
--- TODO: instead of just an acc, allow also to set velocity(s) or position(s)
---       XXX: need absolute time too?
 rigidObject :: Monad m => RigidBody -> Wire e m (Acceleration, PostUpdateFun) RigidBody
 rigidObject = accumT1 rigidObject'
     where
     rigidObject' :: Time -> RigidBody -> (Acceleration, PostUpdateFun) -> RigidBody
     rigidObject' dt _ _ | dt <= 0 = error $ "dt = " ++ show dt ++ " in rigidObject'"
-    rigidObject' dt body (acc, postUpdate) = postUpdate (updateStateVars (ode body 0 dt acc))
+    rigidObject' dt body (acc, postUpdate) = postUpdate $ ode body 0 dt acc
 
 updateStateVars :: RigidBody -> RigidBody
 updateStateVars body =
-    (v     .~ body^.p / realToFrac (body^.mass))
+    (v     .~ scale (1/(body^.mass)) (body^.p))
   . (iInv  .~ body^.r <> body^.iBodyInv <> trans (body^.r))
   . (omega .~ body^.iInv <> body^.l)
   $ body
@@ -67,7 +65,7 @@ updateStateVars body =
 dydt :: Acceleration -> RigidBody -> Time -> RigidBodyDiff
 dydt acc body t = RigidBodyDiff (body^.v) rDot' force torque
     where
-    (force, torque) = acc body -- XXX: how should acceleration interact with time?!?!
+    (force, torque) = acc body
     rDot'           = star (body^.omega) <> body^.r
 
 ode :: RigidBody

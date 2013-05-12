@@ -39,11 +39,18 @@ initialCube = Object basicCuboid forceFunction (createUniformBody basicCuboid & 
 
     -- if z <= 1, reverse its vertical speed
     bounce :: RigidBody -> RigidBody
-    bounce body | (body^.x) @> 2 <= 1 = p %~ mapVector negate $ body
+    bounce body | (body^.x) @> 2 <= 1 = p %~ mapVectorWithIndex flipVert $ body
                 | otherwise           = body
+
+    flipVert :: Int -> Double -> Double
+    flipVert 2 = negate
+    flipVert _ = id
 
     basicCuboid = Cuboid 1 1 1
     startingPos = fromList [0,0,10]
+
+initialCube2 :: Object
+initialCube2 = initialCube & body.x .~ (fromList [0,0,20])
 
 -- | Given an initial object, turn it into a Wire that holds its state
 objectToWire :: Monad m => Object -> Wire e m Input Object
