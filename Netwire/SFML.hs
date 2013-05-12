@@ -46,8 +46,9 @@ runGameWire fps draw finalise wire window = do
   draw' = draw window
   loop w lastEvent = do
     now <- getCurrentTime
-    let dt = realToFrac $ diffUTCTime now lastEvent
-    let processEvent mEvent | isJust mEvent || fps == 0 || dt > spf = do
+    let
+      dt = realToFrac $ diffUTCTime now lastEvent
+      processEvent mEvent | isJust mEvent || fps == 0 || dt > spf = do
         (eOut, w') <- stepWire w dt mEvent
         either (error "wire inhibited")
              (\out -> unless (toExit out) $ do

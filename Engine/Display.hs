@@ -37,8 +37,11 @@ lookAtView view = do
 
 drawBasicObject :: BasicObject -> IO ()
 drawBasicObject (Sphere radius) = renderQuadric style $ GL.Sphere radius 10 10
-  where
-  style = QuadricStyle Nothing NoTextureCoordinates Outside FillStyle
+  where style = QuadricStyle
+                  Nothing
+                  NoTextureCoordinates
+                  Outside
+                  FillStyle
 drawBasicObject (Cuboid xlen ylen zlen) = preservingMatrix $ do
   scale (xlen/2) (ylen/2) (zlen/2)
   renderPrimitive Quads . mapM_ vertex $

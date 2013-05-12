@@ -24,9 +24,9 @@ type PostUpdateFun = RigidBody -> RigidBody
 
 data RigidBody = RigidBody {
   -- Constant quantities
-  _mass    :: Double,    -- mass M
-  _iBody   :: Matrix Double, -- I_body
-  _iBodyInv  :: Matrix Double, -- (I_body)^(-1)
+  _mass     :: Double,    -- mass M
+  _iBody    :: Matrix Double, -- I_body
+  _iBodyInv :: Matrix Double, -- (I_body)^(-1)
 
   -- State variables
   _x     :: Vector Double, -- x(t)
@@ -35,9 +35,9 @@ data RigidBody = RigidBody {
   _l     :: Vector Double, -- L(t)
 
   -- Derived quantities (auxiliary variables)
-  _iInv    :: Matrix Double, -- I^(-1)(t)
+  _iInv  :: Matrix Double, -- I^(-1)(t)
   _v     :: Vector Double, -- v(t)
-  _omega   :: Vector Double}  -- \omega(t)
+  _omega :: Vector Double}  -- \omega(t)
 
 data RigidBodyDiff = RigidBodyDiff {
   _dxdt :: Vector Double, -- d/dt (x(t)) = v(t)
@@ -66,7 +66,7 @@ dydt :: Acceleration -> RigidBody -> Time -> RigidBodyDiff
 dydt acc body t = RigidBodyDiff (body^.v) rDot' force torque
   where
   (force, torque) = acc body
-  rDot'       = star (body^.omega) <> body^.r
+  rDot' = star (body^.omega) <> body^.r
 
 ode :: RigidBody
   -> Time

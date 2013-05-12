@@ -27,10 +27,11 @@ initialWorld = World [initialCube, initialCube2] initialView
 worldWire :: Wire () IO Input (Output World)
 worldWire = proc mEvent -> do
   world <- worldToWire initialWorld -< mEvent
-  let (draw, exit) = case mEvent of
-      Just SFEvtClosed             -> (False, True )
+  let
+    (draw, exit) = case mEvent of
+      Just SFEvtClosed                         -> (False, True )
       Just (SFEvtKeyPressed KeyEscape _ _ _ _) -> (False, True )
-      _                    -> (True , False)
+      _                                        -> (True , False)
   returnA -< Output world draw exit
 
 worldToWire :: (Monoid e, Monad m) => World -> Wire e m Input World
