@@ -19,7 +19,7 @@ makeLenses ''BasicObject
 
 data Object = Object
     { _basicObject :: BasicObject
-    , _forces      :: (Input -> (Acceleration, PostUpdateFun))
+    , _forces      :: Input -> (Acceleration, PostUpdateFun)
     , _body        :: RigidBody}
 makeLenses ''Object
 
@@ -50,7 +50,7 @@ initialCube = Object basicCuboid forceFunction (createUniformBody basicCuboid & 
     startingPos = fromList [0,0,10]
 
 initialCube2 :: Object
-initialCube2 = initialCube & body.x .~ (fromList [0,0,20])
+initialCube2 = initialCube & (body.x.~ (fromList [0,0,20])).(body.p .~ (fromList [1,0,0]))
 
 -- | Given an initial object, turn it into a Wire that holds its state
 objectToWire :: Monad m => Object -> Wire e m Input Object

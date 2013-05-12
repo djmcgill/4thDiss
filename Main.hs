@@ -1,8 +1,6 @@
-import Netwire.SFML
+import Netwire.SFML (adaptSimple)
 
-import Engine.Display
-import Engine.World
-
--- TODO: consistent formatting
+import Engine.Display (drawWorld)
+import Engine.World (worldWire)
 
 main = adaptSimple "testSFMLAndRigidBody" drawWorld worldWire

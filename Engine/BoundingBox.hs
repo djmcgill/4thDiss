@@ -18,16 +18,7 @@ type ID = Int
 type Interval      = (ID, Double, Double)
 type IntervalAxis  = [(Double, IntervalPoint)]
 data IntervalPoint = Start ID | End ID
-    -- the Ord instance means that Start gets put before End on the same point, so collisions definately still happen
     deriving (Eq, Ord)
-
--- TODO: add a way to add a single interval to an already existing structure
---           i.e. rework out IntervalAxis, then if two IntervalPoints have switched
---           then they have changed whether or not they are overlapped
---       IntMap, or even Vector
---       portentially switch to paolino's code (see chatlog)?
--- talk: sort and sweep algorithm
---       talk about optimising with addInterval and removeInterval
 
 -- | Given a list of objects, return the pairs of collisions and
 --   and remaining non-collided ones.
@@ -79,6 +70,3 @@ findOverlaps = snd . foldl' processInterval (S.empty, [])
     processInterval (active, found) (_, Start id) = (S.insert id active, map (,id) (S.toList active) ++ found) -- collide them here
     -- an interval ends, so remove it from the active set
     processInterval (active, found) (_, End   id) = (S.delete id active, found)
-
---addInterval
---removeInterval

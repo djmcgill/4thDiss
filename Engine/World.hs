@@ -2,7 +2,6 @@
 
 module Engine.World where
 
-import Engine.BoundingBox
 import Engine.Objects
 import Engine.View
 import Netwire.SFML

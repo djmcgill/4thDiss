@@ -10,12 +10,7 @@ import SFML.Window
 
 import Netwire.SFML
 
---TODO: have a good think about possibly needed wires
---      rexport from Netwire.SFML?
-
 -- | Remembers the size of the window.
---   XXX: not called yet?
---   XXX: assumed there is only one window
 windowSize :: (Monoid e, Monad m) => Wire e m Input (Maybe (Int, Int))
 windowSize = hold Nothing (Just <$> resized)
 

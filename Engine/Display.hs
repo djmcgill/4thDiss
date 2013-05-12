@@ -19,7 +19,7 @@ drawWorld window world = do
 
     matrixMode $= Projection
     loadIdentity
-    perspective 90 1 1 50 -- probably don't need to call this every frame
+    perspective 90 1 1 50
     lookAtView $ world^.worldView
 
     forM_ (world^.objects) $ \(Object basicObj _ body) -> preservingMatrix $ do

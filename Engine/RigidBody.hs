@@ -30,7 +30,7 @@ data RigidBody = RigidBody {
 
     -- State variables
     _x         :: Vector Double, -- x(t)
-    _r         :: Matrix Double, -- R(t) TODO: quaternions instead of matrices
+    _r         :: Matrix Double, -- R(t)
     _p         :: Vector Double, -- P(t)
     _l         :: Vector Double, -- L(t)
 
@@ -43,7 +43,7 @@ data RigidBodyDiff = RigidBodyDiff {
     _dxdt :: Vector Double, -- d/dt (x(t)) = v(t)
     _rDot :: Matrix Double, -- Rdot(t)     = star(omega(t))R(t)
     _dpdt :: Vector Double, -- d/dt (P(t)) = F(t)
-    _dldt :: Vector Double}  -- d/dt (L(t)) = tau(t)
+    _dldt :: Vector Double} -- d/dt (L(t)) = tau(t)
 
 makeLenses ''RigidBody
 makeLenses ''RigidBodyDiff
@@ -81,16 +81,12 @@ ode body start end accFun = updateRigidBody body . (!! 1) . toRows $ matSoln
 
     step = (end - start)/100
 
-    -- convert between vector and rigidbody
-    -- TODO: check this
     dydt' :: Double -> Vector Double -> Vector Double
     dydt' t vec = rigidBodyDiffToVec $ dydt accFun (updateRigidBody body vec) t
 
     -- convert between the range (start, end) to (0, end - start)
     dydt'' = dydt' . subtract start
 
-    -- TODO: why does ode need multiple times?
-    --- XXX: BUG HERE, intermittent crashes
     times = fromList [0, end - start]
 
 star :: Vector Double -> Matrix Double
@@ -99,8 +95,6 @@ star a = (3><3)
        a @> 2 ,       0 ,-(a @> 0),
      -(a @> 1),  a @> 0 ,       0 ]
 
--- TODO: is this a lens isomorphism or something?
--- XXX: is toRows okay?
 rigidBodyToVec :: RigidBody -> Vector Double
 rigidBodyToVec body' = join $ body'^.x : toRows (body'^.r) ++ [body'^.p, body'^.l]
 
